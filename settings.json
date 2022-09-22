@@ -1,0 +1,29 @@
+{
+  "root_directory": "C:/Root/",
+  "color_themes": {
+    "standard": {
+      "bg": "#006165",
+      "fg": "#174A4C",
+      "text": "#FAFAFA",
+      "hlt": "#DA4C42"
+    },
+    "cyberpunk": {
+      "bg": "",
+      "fg": "",
+      "text": "",
+      "hlt": ""
+    },
+    "green": {
+      "bg": "",
+      "fg": "",
+      "text": "",
+      "hlt": ""
+    },
+    "ocean": {
+      "bg": "",
+      "fg": "",
+      "text": "",
+      "hlt": ""
+    }
+  }
+}
