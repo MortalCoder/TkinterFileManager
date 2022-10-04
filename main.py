@@ -1,6 +1,7 @@
 import os
 import json
 import tkinter as tk
+import tkinter.messagebox
 
 
 class FileManager:
@@ -48,29 +49,28 @@ class FileManager:
         # The input entry
         self.entry_main = tk.Entry(self.main_frame, font='Terminal 24', width=18, fg=color_scheme['fg'])
         self.entry_main.grid(row=2, column=0, padx=10, pady=10)
-
         # The make-folder button
         self.bt_make_folder = tk.Button(
             self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
-            command=lambda: self.set_active_function(self.make_folder),
+            command=lambda: self.set_active_function(self.make_folder, 'Enter folder\nname'),
             text='Make folder', width=25, height=4)
         self.bt_make_folder.grid(row=0, column=0, padx=20, pady=15)
         # The delete-folder button
         self.bt_delete_folder = tk.Button(
             self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
-            command=lambda: self.set_active_function(self.delete_folder),
+            command=lambda: self.set_active_function(self.delete_folder, 'Enter folder name\nto delete'),
             text='Delete folder', width=25, height=4)
         self.bt_delete_folder.grid(row=1, column=0, padx=20, pady=15)
         # The remove-file button
         self.bt_remove_file = tk.Button(
             self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
-            command=lambda: self.set_active_function(self.remove_file),
+            command=lambda: self.set_active_function(self.remove_file, 'Enter file name\nto remove'),
             text='Remove file', width=25, height=4)
         self.bt_remove_file.grid(row=1, column=1, padx=20, pady=15)
         # The go-to button
         self.bt_go_to = tk.Button(
             self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
-            command=lambda: self.set_active_function(self.go_to),
+            command=lambda: self.set_active_function(self.go_to, 'Enter folder\nto go to'),
             text='Go to folder', width=25, height=4)
         self.bt_go_to.grid(row=2, column=0, padx=20, pady=15)
         # The go-up button
@@ -82,15 +82,20 @@ class FileManager:
         # The go-up button
         self.bt_rename_file = tk.Button(
             self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
-            command=lambda: self.set_active_function(self.rename),
+            command=lambda: self.set_active_function(self.rename, 'Enter:\noldname|newname'),
             text='Rename file/folder', width=25, height=4)
         self.bt_rename_file.grid(row=0, column=1, padx=20, pady=15)
         # The make-file button
         self.bt_make_file = tk.Button(
             self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
-            command=lambda: self.set_active_function(self.make_file),
+            command=lambda: self.set_active_function(self.make_file, 'Enter file\nname'),
             text='Make file', width=25, height=4)
         self.bt_make_file.grid(row=3, column=0, padx=20, pady=15)
+        self.bt_open_file = tk.Button(
+            self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
+            command=lambda: self.set_active_function(self.open_file, 'Enter file\nname to open'),
+            text='Open file', width=25, height=4)
+        self.bt_open_file.grid(row=4, column=0, padx=20, pady=15)
         # The confirm button
         self.bt_confirm = tk.Button(
             self.main_frame, bg=color_scheme['bg'], fg=color_scheme['text'], command=self.confirm,
@@ -102,16 +107,51 @@ class FileManager:
 
         self.active_function = None
 
-    def set_active_function(self, function):
+    def set_active_function(self, function, comment='USE THE BOX BELOW\nFOR THE INPUT'):
+        self.lbl_main['text'] = comment
         self.active_function = function
 
     def confirm(self):
         if self.active_function:
             self.active_function()
+            self.lbl_main['text'] = 'USE THE BOX BELOW\nFOR THE INPUT'
         else:
             self.lbl_info['text'] = 'NOTHING TO DO'
         self.lbl_list['text'] = '\n'.join(os.listdir())
-        self.entry_main['text'] = ''
+        self.entry_main.selection_clear()
+
+    def open_file(self):
+        try:
+            assert self.entry_main.get()
+            with open(self.entry_main.get(), 'r') as file:
+                text = '\n'.join([row for row in file.readlines()])
+                tkinter.messagebox.showinfo(message=text)
+        except AssertionError or FileNotFoundError:
+            self.lbl_info['text'] = 'ERROR'
+
+    def write_file(self):
+        try:
+            assert self.entry_main.get()
+            with open(self.entry_main.get(), 'a') as file:
+                file.write(self.entry_main.get())
+        except AssertionError:
+            self.lbl_info['text'] = 'ERROR'
+
+    def move_file(self):
+        try:
+            assert self.entry_main.get()
+            os.rename(f'{self.settings["root"]}{self.entry_main.get().split("|")[0]}',
+                      f'{self.settings["root"]}{self.entry_main.get().split("|")[1]}')
+        except AssertionError or FileExistsError:
+            self.lbl_info['text'] = 'ERROR'
+
+    def copy_file(self):
+        try:
+            assert self.entry_main.get()
+            with open(self.entry_main.get(), 'a') as file:
+                file.write(self.entry_main.get())
+        except AssertionError:
+            self.lbl_info['text'] = 'ERROR'
 
     def make_folder(self):
         try:
