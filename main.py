@@ -1,5 +1,6 @@
 import os
 import json
+import shutil
 import tkinter as tk
 import tkinter.messagebox
 
@@ -54,53 +55,72 @@ class FileManager:
             self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
             command=lambda: self.set_active_function(self.make_folder, 'Enter folder\nname'),
             text='Make folder', width=25, height=4)
-        self.bt_make_folder.grid(row=0, column=0, padx=20, pady=15)
+        self.bt_make_folder.grid(row=0, column=0, padx=20, pady=10)
         # The delete-folder button
         self.bt_delete_folder = tk.Button(
             self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
             command=lambda: self.set_active_function(self.delete_folder, 'Enter folder name\nto delete'),
             text='Delete folder', width=25, height=4)
-        self.bt_delete_folder.grid(row=1, column=0, padx=20, pady=15)
+        self.bt_delete_folder.grid(row=1, column=0, padx=20, pady=10)
         # The remove-file button
         self.bt_remove_file = tk.Button(
             self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
             command=lambda: self.set_active_function(self.remove_file, 'Enter file name\nto remove'),
             text='Remove file', width=25, height=4)
-        self.bt_remove_file.grid(row=1, column=1, padx=20, pady=15)
+        self.bt_remove_file.grid(row=1, column=1, padx=20, pady=10)
         # The go-to button
         self.bt_go_to = tk.Button(
             self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
             command=lambda: self.set_active_function(self.go_to, 'Enter folder\nto go to'),
             text='Go to folder', width=25, height=4)
-        self.bt_go_to.grid(row=2, column=0, padx=20, pady=15)
+        self.bt_go_to.grid(row=2, column=0, padx=20, pady=10)
         # The go-up button
         self.bt_go_up = tk.Button(
             self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
             command=lambda: self.set_active_function(self.go_up),
             text='Go up', width=25, height=4)
-        self.bt_go_up.grid(row=2, column=1, padx=20, pady=15)
+        self.bt_go_up.grid(row=2, column=1, padx=20, pady=10)
         # The go-up button
         self.bt_rename_file = tk.Button(
             self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
             command=lambda: self.set_active_function(self.rename, 'Enter:\noldname|newname'),
             text='Rename file/folder', width=25, height=4)
-        self.bt_rename_file.grid(row=0, column=1, padx=20, pady=15)
+        self.bt_rename_file.grid(row=0, column=1, padx=20, pady=10)
         # The make-file button
         self.bt_make_file = tk.Button(
             self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
             command=lambda: self.set_active_function(self.make_file, 'Enter file\nname'),
             text='Make file', width=25, height=4)
-        self.bt_make_file.grid(row=3, column=0, padx=20, pady=15)
+        self.bt_make_file.grid(row=3, column=0, padx=20, pady=10)
+        # The open-file button
         self.bt_open_file = tk.Button(
             self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
             command=lambda: self.set_active_function(self.open_file, 'Enter file\nname to open'),
             text='Open file', width=25, height=4)
-        self.bt_open_file.grid(row=4, column=0, padx=20, pady=15)
+        self.bt_open_file.grid(row=4, column=0, padx=20, pady=10)
+        # The copy-file button
+        self.bt_copy_file = tk.Button(
+            self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
+            command=lambda: self.set_active_function(self.copy_file, 'Enter:\nsrc|dst'),
+            text='Copy file', width=25, height=4)
+        self.bt_copy_file.grid(row=4, column=1, padx=20, pady=10)
+        # The write-file button
+        self.bt_write_file = tk.Button(
+            self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
+            command=lambda: self.set_active_function(self.write_file, 'Enter:\nfilename|text'),
+            text='Write file', width=25, height=4)
+        self.bt_write_file.grid(row=3, column=1, padx=20, pady=10)
+        # The move-file button
+        self.bt_move_file = tk.Button(
+            self.side_frame, bg=color_scheme['fg'], fg=color_scheme['text'],
+            command=lambda: self.set_active_function(self.move_file, 'Enter:\nfilename|dst'),
+            text='Move file', width=25, height=4)
+        self.bt_move_file.grid(row=5, column=0, padx=20, pady=10)
         # The confirm button
         self.bt_confirm = tk.Button(
             self.main_frame, bg=color_scheme['bg'], fg=color_scheme['text'], command=self.confirm,
             text='Confirm', width=25, height=4)
-        self.bt_confirm.grid(row=3, column=0, padx=20, pady=15)
+        self.bt_confirm.grid(row=3, column=0, padx=20, pady=10)
 
         print(self.settings)
         print(os.getcwd())
@@ -132,8 +152,8 @@ class FileManager:
     def write_file(self):
         try:
             assert self.entry_main.get()
-            with open(self.entry_main.get(), 'a') as file:
-                file.write(self.entry_main.get())
+            with open(self.entry_main.get().split('|')[0], 'a') as file:
+                file.write(self.entry_main.get().split('|')[1])
         except AssertionError:
             self.lbl_info['text'] = 'ERROR'
 
@@ -148,8 +168,8 @@ class FileManager:
     def copy_file(self):
         try:
             assert self.entry_main.get()
-            with open(self.entry_main.get(), 'a') as file:
-                file.write(self.entry_main.get())
+            shutil.copyfile(f'{self.settings["root"]}{self.entry_main.get().split("|")[0]}',
+                            f'{self.settings["root"]}{self.entry_main.get().split("|")[1]}')
         except AssertionError:
             self.lbl_info['text'] = 'ERROR'
 
